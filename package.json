@@ -1,0 +1,23 @@
+{
+  "name": "cloudworker-middlewares",
+  "version": "0.0.1",
+  "description": "Cloudflare functions middlewares",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/markusahlstrand/cloudworker-middlewares.git"
+  },
+  "author": "Markus Ahlstrand",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/markusahlstrand/cloudworker-middlewares/issues"
+  },
+  "homepage": "https://github.com/markusahlstrand/cloudworker-middlewares#readme",
+  "dependencies": {
+    "lodash.get": "4.4.2",
+    "lodash.set": "4.3.2"
+  }
+}
