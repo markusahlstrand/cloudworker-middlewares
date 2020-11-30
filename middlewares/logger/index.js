@@ -4,8 +4,6 @@ const _ = {
   get: lodashGet,
 };
 
-const HttpLogger = require("../../services/http-logger");
-
 async function streamToString(readable, maxSize) {
   const results = [];
   const reader = readable.getReader();
@@ -46,9 +44,7 @@ async function getBody(request) {
   return streamToString(clonedRequest.body, 1024 * 10);
 }
 
-module.exports = function logger(options) {
-  const logService = new HttpLogger(options);
-
+module.exports = function logger({ logService }) {
   return async (ctx, next) => {
     ctx.state["logger-startDate"] = new Date();
     const body = await getBody(ctx.event.request);
