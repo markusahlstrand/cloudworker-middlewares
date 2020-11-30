@@ -1,11 +1,10 @@
 const lodashGet = require("lodash.get");
-const packageJson = require("../../package.json");
 
 const _ = {
   get: lodashGet,
 };
 
-const HttpLogger = require("../services/http-logger");
+const HttpLogger = require("../../services/http-logger");
 
 async function streamToString(readable, maxSize) {
   const results = [];
@@ -78,7 +77,6 @@ module.exports = function logger(options) {
         ttfb: new Date() - ctx.state["logger-startDate"],
         redirectUrl: ctx.userRedirect,
         severity: 30,
-        proxyVersion: packageJson.version,
       };
 
       ctx.event.waitUntil(logService.log(data));
@@ -95,7 +93,6 @@ module.exports = function logger(options) {
         stack: err.stack,
         error: err.message,
         severity: 50,
-        proxyVersion: packageJson.version,
       };
 
       ctx.event.waitUntil(logService.log(errData));
