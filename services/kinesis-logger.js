@@ -26,7 +26,7 @@ module.exports = class KinesisLogger {
   }
 
   async sendMessage(message) {
-    const data = btoa(`${JSON.stringify(message)}\n`);
+    const data = btoa(`${message}\n`);
     const body = JSON.stringify({
       DeliveryStreamName: this.streamName,
       Record: {
