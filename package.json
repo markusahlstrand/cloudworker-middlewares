@@ -1,6 +1,6 @@
 {
   "name": "cloudworker-middlewares",
-  "version": "0.0.6",
+  "version": "0.1.0",
   "description": "Cloudflare functions middlewares",
   "main": "index.js",
   "scripts": {
