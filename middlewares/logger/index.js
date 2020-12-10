@@ -44,7 +44,7 @@ async function getBody(request) {
   return streamToString(clonedRequest.body, 1024 * 10);
 }
 
-async function defaultFormatter({ ctx, event, serverity }) {
+async function defaultFormatter({ ctx, event, severity }) {
   return {
     message: event,
     requestIp: _.get(ctx, "request.headers.x-real-ip"),
