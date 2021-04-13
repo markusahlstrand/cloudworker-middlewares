@@ -1,40 +1,49 @@
-const lodashGet = require('lodash.get');
-const lodashSet = require('lodash.set');
-
-const _ = {
-  get: lodashGet,
-  set: lodashSet,
-};
-
-module.exports = function rateLimitHandler({ type = 'IP', scope = 'default', limit = 1000 }) {
-  const buckets = {};
-
-  function getKey(currentMinute, headers) {
+module.exports = function rateLimitHandler({
+  type = 'IP',
+  scope = 'default',
+  limit = 1000,
+  storage,
+}) {
+  function getKey(headers) {
     const ip = headers['x-real-ip'];
 
     if (type === 'IP') {
-      return `minute.${currentMinute}.${scope}.${ip}`;
+      return `${scope}.${ip}`;
     }
 
-    return `minute.${currentMinute}.${scope}.account`;
+    return `${scope}.account`;
   }
 
-  function cleanUp(currentMinute) {
-    const minutes = _.get(buckets, 'minutes', {});
-    Object.keys(minutes).forEach((minute) => {
-      if (minute !== currentMinute) {
-        delete buckets.minutes.minute;
-      }
+  async function getCount(key, currentMinute) {
+    const jsonString = await storage.get(key);
+
+    if (!jsonString) {
+      return 0;
+    }
+
+    const data = JSON.parse(jsonString);
+    if (data.minute !== currentMinute) {
+      return 0;
+    }
+
+    return data.count;
+  }
+
+  async function setCount(key, currentMinute, count) {
+    const jsonString = JSON.stringify({
+      minute: currentMinute,
+      count,
     });
+    await storage.set(key, jsonString);
   }
 
   return async (ctx, next) => {
     const currentMinute = Math.trunc(Date.now() / (1000 * 60));
     const reset = Math.trunc(currentMinute * 60 + 60 - Date.now() / 1000);
 
-    const key = getKey(currentMinute, ctx.request.headers);
+    const key = getKey(ctx.request.headers);
 
-    let count = _.get(buckets, key, 0);
+    let count = await getCount(key, currentMinute);
 
     // Don't count head and options reqests
     if (['HEAD', 'OPTIONS'].indexOf(ctx.request.method) === -1) {
@@ -45,14 +54,12 @@ module.exports = function rateLimitHandler({ type = 'IP', scope = 'default', lim
     ctx.set('X-Ratelimit-Count', count);
     ctx.set('X-Ratelimit-Reset', reset);
 
-    _.set(buckets, key, count);
+    await setCount(key, currentMinute, count);
 
     if (limit < count) {
       ctx.status = 429;
       return;
     }
-
-    cleanUp(currentMinute);
 
     await next(ctx);
   };
