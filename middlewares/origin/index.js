@@ -1,6 +1,6 @@
-const lodashGet = require("lodash.get");
-const constants = require("../constants");
-const { filterCfHeaders, instanceToJson } = require("../../utils");
+const lodashGet = require('lodash.get');
+const constants = require('../../constants');
+const { filterCfHeaders, instanceToJson } = require('../../utils');
 
 const _ = {
   get: lodashGet,
@@ -17,12 +17,12 @@ module.exports = function originHandler(options) {
     const requestOptions = {
       headers: filterCfHeaders(ctx.request.headers),
       method: ctx.request.method,
-      redirect: "manual",
+      redirect: 'manual',
     };
 
     if (
       constants.methodsMethodsWithBody.indexOf(ctx.request.method) !== -1 &&
-      _.get(ctx, "event.request.body")
+      _.get(ctx, 'event.request.body')
     ) {
       const clonedRequest = ctx.event.request.clone();
       requestOptions.body = clonedRequest.body;
